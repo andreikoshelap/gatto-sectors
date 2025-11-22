@@ -1,0 +1,21 @@
+.main-nav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+
+  a {
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+
+    &.active {
+      background: #eee;
+      font-weight: 600;
+    }
+  }
+}
+
+.main-content {
+  padding: 1rem;
+}
