@@ -41,7 +41,6 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // удобные геттеры под строгий template type-checking
   get nameCtrl(): FormControl {
     return this.form.get('name') as FormControl;
   }
@@ -50,14 +49,11 @@ export class ProfileComponent implements OnInit {
     return this.form.get('sectorIds') as FormControl;
   }
 
-  // пока заглушки — потом допишем логику сохранения/рестора
   save(): void {
-    // TODO: вызывать API сохранения профиля
     console.log('save', this.form.value);
   }
 
   restore(): void {
-    // TODO: вызывать API восстановления профиля
     console.log('restore', this.nameCtrl.value);
   }
 }
