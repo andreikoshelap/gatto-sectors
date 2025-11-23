@@ -1,1 +1,88 @@
-<p>admin-sectors works!</p>
+<div class="admin-container">
+  <h1>Sectors administration</h1>
+
+  <div class="messages">
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+    <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
+  </div>
+
+  <div class="admin-layout">
+    <!-- Left panel -->
+    <section class="list-panel">
+      <div class="list-header">
+        <h2>All sectors</h2>
+        <button type="button" (click)="startCreate()">+ New sector</button>
+      </div>
+
+      <div *ngIf="loading">Loading...</div>
+
+      <table *ngIf="!loading && sectors.length" class="sectors-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Parent</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let sector of sectors">
+          <td>{{ sector.id }}</td>
+          <td>{{ sector.name }}</td>
+          <td>{{ getParentName(sector) }}</td>
+          <td class="actions-col">
+            <button type="button" (click)="startEdit(sector)">Edit</button>
+            <button type="button" class="danger" (click)="delete(sector)">Delete</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <p *ngIf="!loading && !sectors.length">No sectors found.</p>
+    </section>
+
+    <!-- Right panel -->
+    <section class="form-panel">
+      <h2 *ngIf="selectedSector">Edit sector</h2>
+      <h2 *ngIf="!selectedSector">Create sector</h2>
+
+      <form [formGroup]="sectorForm" (ngSubmit)="submit()">
+        <div class="form-field">
+          <label for="name">Name</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            [class.invalid]="f.name.touched && f.name.invalid"
+          />
+          <div class="error" *ngIf="f.name.touched && f.name.invalid">
+            Name is required
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="parentId">Parent sector</label>
+          <select id="parentId" formControlName="parentId">
+            <option [ngValue]="null">No parent</option>
+            <option
+              *ngFor="let s of sectors"
+              [ngValue]="s.id"
+            >
+              {{ s.name }} (id: {{ s.id }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="loading">
+            {{ selectedSector ? 'Save changes' : 'Create' }}
+          </button>
+
+          <button type="button" (click)="startCreate()" [disabled]="loading">
+            Clear
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
