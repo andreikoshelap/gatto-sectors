@@ -1,1 +1,46 @@
-<p>profile works!</p>
+<h2>User sectors</h2>
+
+<div class="messages">
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+  <p *ngIf="message" class="success">{{ message }}</p>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <div class="form-field">
+    <label for="name">Name</label>
+    <input
+      id="name"
+      type="text"
+      formControlName="name"
+      [class.invalid]="nameCtrl.touched && nameCtrl.invalid"
+    />
+    <div class="error" *ngIf="nameCtrl.touched && nameCtrl.invalid">
+      Name is required
+    </div>
+  </div>
+
+  <div class="form-field">
+    <label for="sectors">Sectors</label>
+    <select
+      id="sectors"
+      multiple
+      size="8"
+      formControlName="sectorIds"
+      [class.invalid]="sectorIdsCtrl.touched && sectorIdsCtrl.invalid"
+    >
+      <option *ngFor="let s of sectors" [ngValue]="s.id">
+        {{ s.name }}
+      </option>
+    </select>
+    <div class="error" *ngIf="sectorIdsCtrl.touched && sectorIdsCtrl.invalid">
+      Please select at least one sector
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" [disabled]="loading || form.invalid">Save</button>
+    <button type="button" (click)="restore()" [disabled]="loading">
+      Restore
+    </button>
+  </div>
+</form>

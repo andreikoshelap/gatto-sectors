@@ -1,62 +1,71 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
-import { Sector, SaveSectorRequest } from '../../core/models/sector.model';
+import { Sector } from '../../core/models/sector.model';
 
 @Component({
   selector: 'app-admin-sectors',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './admin-sectors.component.html',
-  styleUrl: './admin-sectors.component.scss'
+  styleUrl: './admin-sectors.component.scss',
 })
 export class AdminSectorsComponent implements OnInit {
-
   sectors: Sector[] = [];
   loading = false;
   errorMessage = '';
   successMessage = '';
-
-  // selected sector for editing, null when creating new
   selectedSector: Sector | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private api: ApiService
-  ) {}
+  form: FormGroup;
 
-  // @ts-ignore
-  sectorForm = this.fb.group({
-    name: ['', Validators.required],
-    parentId: [null as number | null]
-  });
+  constructor(private fb: FormBuilder, private api: ApiService) {
+    this.form = this.fb.group({
+      name: ['', Validators.required],
+      parentId: [null],
+    });
+  }
 
   ngOnInit(): void {
     this.loadSectors();
+  }
+
+  get nameCtrl(): FormControl {
+    return this.form.get('name') as FormControl;
+  }
+
+  get parentIdCtrl(): FormControl {
+    return this.form.get('parentId') as FormControl;
   }
 
   loadSectors(): void {
     this.loading = true;
     this.errorMessage = '';
     this.api.getSectors().subscribe({
-      next: sectors => {
-        // sort sectors by name
+      next: (sectors) => {
         this.sectors = sectors.sort((a, b) => a.name.localeCompare(b.name));
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Failed to load sectors', err);
         this.errorMessage = 'Failed to load sectors';
         this.loading = false;
-      }
+      },
     });
   }
 
   startCreate(): void {
     this.selectedSector = null;
-    this.sectorForm.reset({
+    this.form.reset({
       name: '',
-      parentId: null
+      parentId: null,
     });
     this.successMessage = '';
     this.errorMessage = '';
@@ -64,23 +73,23 @@ export class AdminSectorsComponent implements OnInit {
 
   startEdit(sector: Sector): void {
     this.selectedSector = sector;
-    this.sectorForm.reset({
+    this.form.reset({
       name: sector.name,
-      parentId: sector.parentId ?? null
+      parentId: sector.parentId ?? null,
     });
     this.successMessage = '';
     this.errorMessage = '';
   }
 
   submit(): void {
-    if (this.sectorForm.invalid) {
-      this.sectorForm.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    const payload: SaveSectorRequest = {
-      name: this.sectorForm.value.name!,
-      parentId: this.sectorForm.value.parentId ?? null
+    const payload = {
+      name: this.nameCtrl.value,
+      parentId: this.parentIdCtrl.value ?? null,
     };
 
     this.loading = true;
@@ -88,20 +97,19 @@ export class AdminSectorsComponent implements OnInit {
     this.successMessage = '';
 
     if (this.selectedSector) {
-      // update
       this.api.updateSector(this.selectedSector.id, payload).subscribe({
         next: () => {
           this.successMessage = 'Sector updated';
           this.loading = false;
           this.loadSectors();
         },
-        error: () => {
+        error: (err) => {
+          console.error('Failed to update sector', err);
           this.errorMessage = 'Failed to update sector';
           this.loading = false;
-        }
+        },
       });
     } else {
-      // create
       this.api.createSector(payload).subscribe({
         next: () => {
           this.successMessage = 'Sector created';
@@ -109,10 +117,11 @@ export class AdminSectorsComponent implements OnInit {
           this.loadSectors();
           this.startCreate();
         },
-        error: () => {
+        error: (err) => {
+          console.error('Failed to create sector', err);
           this.errorMessage = 'Failed to create sector';
           this.loading = false;
-        }
+        },
       });
     }
   }
@@ -134,24 +143,19 @@ export class AdminSectorsComponent implements OnInit {
           this.startCreate();
         }
       },
-      error: () => {
+      error: (err) => {
+        console.error('Failed to delete sector', err);
         this.errorMessage = 'Failed to delete sector';
         this.loading = false;
-      }
+      },
     });
-  }
-
-  // getter for easy access to form controls
-  get f() {
-    return this.sectorForm.controls;
   }
 
   getParentName(sector: Sector): string {
     if (!sector.parentId) {
       return '—';
     }
-    const parent = this.sectors.find(s => s.id === sector.parentId);
+    const parent = this.sectors.find((s) => s.id === sector.parentId);
     return parent ? parent.name : '#' + sector.parentId;
   }
-
 }
