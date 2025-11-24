@@ -1,20 +1,22 @@
-<div class="admin-container">
-  <h2>Admin: Sectors</h2>
-
-  <div class="messages">
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-    <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
-  </div>
-
+<div class="page">
   <div class="admin-layout">
     <!-- list -->
-    <section class="list-panel">
-      <div class="list-header">
-        <h3>All sectors</h3>
-        <button type="button" (click)="startCreate()">+ New sector</button>
+    <section class="card list-panel">
+      <div class="messages">
+        <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+        <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
       </div>
 
-      <p>Loaded sectors: {{ sectors.length || 0 }}</p>
+      <div class="list-header">
+        <h3 class="card-title">All sectors</h3>
+        <button type="button" class="btn btn-secondary" (click)="startCreate()">
+          + New sector
+        </button>
+      </div>
+
+      <p class="card-subtitle">
+        Loaded sectors: {{ sectors.length || 0 }}
+      </p>
 
       <div *ngIf="loading">Loading...</div>
 
@@ -33,8 +35,18 @@
           <td>{{ sector.name }}</td>
           <td>{{ getParentName(sector) }}</td>
           <td class="actions-col">
-            <button type="button" (click)="startEdit(sector)">Edit</button>
-            <button type="button" class="danger" (click)="delete(sector)">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="startEdit(sector)"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              (click)="delete(sector)"
+            >
               Delete
             </button>
           </td>
@@ -45,9 +57,10 @@
       <p *ngIf="!loading && !sectors.length">No sectors found.</p>
     </section>
 
-    <section class="form-panel">
-      <h3 *ngIf="selectedSector">Edit sector</h3>
-      <h3 *ngIf="!selectedSector">Create sector</h3>
+    <!-- form -->
+    <section class="card form-panel" *ngIf="showFormPanel">
+      <h3 class="card-title" *ngIf="selectedSector">Edit sector</h3>
+      <h3 class="card-title" *ngIf="!selectedSector">Create sector</h3>
 
       <form [formGroup]="form" (ngSubmit)="submit()">
         <div class="form-field">
@@ -63,7 +76,7 @@
           </div>
         </div>
 
-        <div class="form-field">
+        <div class="form-field form-field--compact">
           <label for="parentId">Parent sector</label>
           <select id="parentId" formControlName="parentId">
             <option [ngValue]="null">No parent</option>
@@ -74,10 +87,19 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" [disabled]="loading || form.invalid">
+          <button
+            class="btn btn-primary"
+            type="submit"
+            [disabled]="loading || form.invalid"
+          >
             {{ selectedSector ? 'Save changes' : 'Create' }}
           </button>
-          <button type="button" (click)="startCreate()" [disabled]="loading">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            (click)="cancelForm()"
+            [disabled]="loading"
+          >
             Clear
           </button>
         </div>

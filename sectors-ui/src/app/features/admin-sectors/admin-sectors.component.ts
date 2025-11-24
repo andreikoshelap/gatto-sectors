@@ -23,6 +23,7 @@ export class AdminSectorsComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   selectedSector: Sector | null = null;
+  showFormPanel = false;
 
   form: FormGroup;
 
@@ -67,6 +68,7 @@ export class AdminSectorsComponent implements OnInit {
       name: '',
       parentId: null,
     });
+    this.showFormPanel = true;
     this.successMessage = '';
     this.errorMessage = '';
   }
@@ -77,6 +79,7 @@ export class AdminSectorsComponent implements OnInit {
       name: sector.name,
       parentId: sector.parentId ?? null,
     });
+    this.showFormPanel = true;
     this.successMessage = '';
     this.errorMessage = '';
   }
@@ -124,6 +127,15 @@ export class AdminSectorsComponent implements OnInit {
         },
       });
     }
+    this.showFormPanel = false;
+  }
+  cancelForm(): void {
+    this.form.reset({
+      name: '',
+      parentId: null,
+    });
+    this.selectedSector = null;
+    this.showFormPanel = false;
   }
 
   delete(sector: Sector): void {
@@ -150,6 +162,7 @@ export class AdminSectorsComponent implements OnInit {
       },
     });
   }
+
 
   getParentName(sector: Sector): string {
     if (!sector.parentId) {
