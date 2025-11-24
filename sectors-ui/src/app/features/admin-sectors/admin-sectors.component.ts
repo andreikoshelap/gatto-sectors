@@ -91,6 +91,7 @@ export class AdminSectorsComponent implements OnInit {
     }
 
     const payload = {
+      id: this.selectedSector ? this.selectedSector.id : null,
       name: this.nameCtrl.value,
       parentId: this.parentIdCtrl.value ?? null,
     };
@@ -103,8 +104,9 @@ export class AdminSectorsComponent implements OnInit {
       this.api.updateSector(this.selectedSector.id, payload).subscribe({
         next: () => {
           this.successMessage = 'Sector updated';
-          this.loading = false;
           this.loadSectors();
+          this.selectedSector = null;
+          this.showFormPanel = false;
         },
         error: (err) => {
           console.error('Failed to update sector', err);
@@ -116,9 +118,9 @@ export class AdminSectorsComponent implements OnInit {
       this.api.createSector(payload).subscribe({
         next: () => {
           this.successMessage = 'Sector created';
-          this.loading = false;
           this.loadSectors();
-          this.startCreate();
+          this.selectedSector = null;
+          this.showFormPanel = false;
         },
         error: (err) => {
           console.error('Failed to create sector', err);

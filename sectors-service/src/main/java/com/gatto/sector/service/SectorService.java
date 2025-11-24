@@ -67,17 +67,37 @@ public class SectorService {
     }
 
     @Transactional
-    public SectorView update(Long id, SectorView resourceView) {
-        if (resourceView.id() == null || !resourceView.id().equals(id)) {
+    public SectorView update(Long id, SectorView view) {
+        if (view.id() == null || !view.id().equals(id)) {
             throw new SectorDoesNotExistException();
         }
 
         Sector existing = repository.findById(id)
                 .orElseThrow(SectorDoesNotExistException::new);
+
+        existing.setName(view.name());
+
+        if (view.parentId() != null) {
+            if (view.parentId().equals(id)) {
+                throw new IllegalArgumentException("Sector cannot be parent of itself");
+            }
+            Sector parent = repository.findById(view.parentId())
+                    .orElseThrow(SectorDoesNotExistException::new);
+            existing.setParent(parent);
+        } else {
+            existing.setParent(null);
+        }
+
         Sector saved = repository.save(existing);
 
-        log.debug("Updated sector id={} name={} ", saved.getId(), saved.getName());
+        log.debug("Updated sector id={} name={} parentId={}",
+                saved.getId(),
+                saved.getName(),
+                saved.getParent() != null ? saved.getParent().getId() : null
+        );
+
         return SectorView.fromEntity(saved);
     }
+
 
 }

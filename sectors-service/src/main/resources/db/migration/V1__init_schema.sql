@@ -5,11 +5,11 @@ DROP TABLE IF EXISTS user_sector_selection;
 DROP TABLE IF EXISTS sector;
 
 -- Create tables
-CREATE TABLE IF NOT EXISTS sector (
-    id        BIGINT       PRIMARY KEY,
+CREATE TABLE sector (
+    id        BIGSERIAL PRIMARY KEY,
     name      VARCHAR(255) NOT NULL,
-    parent_id BIGINT NULL REFERENCES sector(id)
-    );
+    parent_id BIGINT REFERENCES sector(id)
+);
 
 CREATE TABLE IF NOT EXISTS user_sector_selection (
     id        BIGSERIAL PRIMARY KEY,

@@ -72,4 +72,15 @@ public class SectorController {
         }
     }
 
+    @PostMapping()
+    public ResponseEntity<SectorView> create(@RequestBody SectorView view) {
+        try {
+            SectorView savedSector = sectorService.create(view);
+            return ResponseEntity.ok(savedSector);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.error("Optimistic locking failure while create sector", e);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
 }
