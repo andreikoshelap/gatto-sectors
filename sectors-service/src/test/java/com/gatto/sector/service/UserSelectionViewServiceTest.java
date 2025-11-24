@@ -4,7 +4,7 @@ import com.gatto.sector.entity.Sector;
 import com.gatto.sector.entity.UserSectorSelection;
 import com.gatto.sector.repository.SectorRepository;
 import com.gatto.sector.repository.UserSectorSelectionRepository;
-import com.gatto.sector.view.UserProfile;
+import com.gatto.sector.view.UserSelectionView;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UserProfileServiceTest {
+class UserSelectionViewServiceTest {
 
     @Mock
     private UserSectorSelectionRepository selectionRepo;
@@ -30,7 +30,7 @@ class UserProfileServiceTest {
     private SectorRepository sectorRepo;
 
     @InjectMocks
-    private UserProfileService service;
+    private UserSelectionService service;
 
     @Test
     @DisplayName("saveProfile: deletes old selections and saves new ones for all found sectors")
@@ -46,9 +46,9 @@ class UserProfileServiceTest {
         // all sectors found
         when(sectorRepo.findAllById(sectorIds)).thenReturn(List.of(s1, s2));
 
-        UserProfile input = new UserProfile(username, sectorIds);
+        UserSelectionView input = new UserSelectionView(username, sectorIds);
 
-        UserProfile result = service.saveProfile(input);
+        UserSelectionView result = service.saveSelection(input);
 
         // 1) deleted old records
         verify(selectionRepo).deleteByUsername(username);
@@ -71,7 +71,7 @@ class UserProfileServiceTest {
         assertTrue(savedSectorIds.containsAll(sectorIds));
 
         // 3) method returns the same profile it received
-        assertEquals(username, result.name());
+        assertEquals(username, result.username());
         assertEquals(sectorIds, result.sectorIds());
     }
 
@@ -86,17 +86,17 @@ class UserProfileServiceTest {
         s1.setId(1L);
         when(sectorRepo.findAllById(sectorIds)).thenReturn(List.of(s1));
 
-        UserProfile input = new UserProfile(username, sectorIds);
+        UserSelectionView input = new UserSelectionView(username, sectorIds);
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.saveProfile(input));
+                () -> service.saveSelection(input));
 
         // save should not be called
         verify(selectionRepo, never()).save(any());
     }
 
     @Test
-    @DisplayName("getProfile: returns UserProfile with name and list of sector ids")
+    @DisplayName("getProfile: returns UserSelectionView with name and list of sector ids")
     void getProfile_returnsProfile() {
         String username = "alice";
 
@@ -116,9 +116,9 @@ class UserProfileServiceTest {
         when(selectionRepo.findByUsername(username))
                 .thenReturn(List.of(sel1, sel2));
 
-        UserProfile result = service.getProfile(username);
+        UserSelectionView result = service.getSelection(username);
 
-        assertEquals(username, result.name());
+        assertEquals(username, result.username());
         assertEquals(List.of(10L, 20L), result.sectorIds());
     }
 
@@ -131,6 +131,6 @@ class UserProfileServiceTest {
                 .thenReturn(List.of());
 
         assertThrows(EntityNotFoundException.class,
-                () -> service.getProfile(username));
+                () -> service.getSelection(username));
     }
 }

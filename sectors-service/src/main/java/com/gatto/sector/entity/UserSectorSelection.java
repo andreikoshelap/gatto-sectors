@@ -7,12 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(
-        name = "user_sector_selection",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"username", "sector_id"})
-        }
-)
+@Table(name = "user_sector_selection")
 @Data
 @Builder
 @AllArgsConstructor
@@ -27,7 +22,7 @@ public class UserSectorSelection {
     private String username;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "sector_id")
+    @JoinColumn(name = "sector_id", nullable = false)
     private Sector sector;
 
 }

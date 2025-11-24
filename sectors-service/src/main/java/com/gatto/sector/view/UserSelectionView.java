@@ -2,7 +2,7 @@ package com.gatto.sector.view;
 
 import java.util.List;
 
-public record UserProfile(
-        String name,
+public record UserSelectionView(
+        String username,
         List<Long>sectorIds
 ) {}

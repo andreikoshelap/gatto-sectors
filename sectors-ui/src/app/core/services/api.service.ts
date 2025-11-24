@@ -28,4 +28,16 @@ export class ApiService {
   deleteSector(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/sectors/${id}`);
   }
+
+  // ---------- PROFILE  ----------
+  saveUserSelection(body: { username: string; sectorIds: number[] }) {
+    return this.http.post<void>(`${this.baseUrl}/user-selections`, body);
+  }
+
+  getUserSelection(username: string) {
+    return this.http.get<{ username: string; sectorIds: number[] }>(
+      `${this.baseUrl}/user-selections`,
+      { params: { username } }
+    );
+  }
 }

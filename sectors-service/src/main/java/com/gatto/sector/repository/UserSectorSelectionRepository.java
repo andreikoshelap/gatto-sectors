@@ -10,4 +10,6 @@ public interface UserSectorSelectionRepository extends JpaRepository<UserSectorS
     List<UserSectorSelection> findByUsername(String username);
 
     void deleteByUsername(String username);
+
+    boolean existsByUsername(String username);
 }

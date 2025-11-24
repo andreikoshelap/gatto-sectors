@@ -75,7 +75,6 @@ export class ProfileComponent implements OnInit {
       }
     };
 
-    // корни — те, у кого parentId = null
     dfs(null, 0);
 
     return result;
@@ -90,10 +89,60 @@ export class ProfileComponent implements OnInit {
   }
 
   save(): void {
-    console.log('save', this.form.value);
+    if (this.form.invalid) {
+      return;
+    }
+
+    const payload = {
+      username: this.nameCtrl.value,
+      sectorIds: this.sectorIdsCtrl.value as number[],
+    };
+
+    this.loading = true;
+    this.errorMessage = '';
+    this.message = '';
+
+    this.api.saveUserSelection(payload).subscribe({
+      next: () => {
+        this.loading = false;
+        this.message = 'Selection saved';
+      },
+      error: (err: any) => {
+        this.loading = false;
+        console.error('Failed to save selection', err);
+        this.errorMessage = 'Failed to save selection';
+      },
+    });
   }
 
+
   restore(): void {
-    console.log('restore', this.nameCtrl.value);
+    const username = this.nameCtrl.value?.trim();
+    if (!username) {
+      this.errorMessage = 'Please enter a name to restore selection';
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+    this.message = '';
+
+    this.api.getUserSelection(username).subscribe({
+      next: (data) => {
+        this.loading = false;
+        // data: { username: string; sectorIds: number[] }
+        this.form.patchValue({
+          name: data.username,
+          sectorIds: data.sectorIds,
+        });
+        this.message = 'Selection restored';
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Failed to restore selection', err);
+        this.errorMessage = 'Failed to restore selection';
+      },
+    });
   }
+
 }

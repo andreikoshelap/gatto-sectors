@@ -1,8 +1,8 @@
 package com.gatto.sector.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gatto.sector.service.UserProfileService;
-import com.gatto.sector.view.UserProfile;
+import com.gatto.sector.service.UserSelectionService;
+import com.gatto.sector.view.UserSelectionView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,47 +18,47 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserProfileController.class)
-class UserProfileControllerTest {
+@WebMvcTest(UserSelectionController.class)
+class UserSelectionViewControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
-    UserProfileService userProfileService;
+    UserSelectionService userSelectionService;
 
     @Autowired
     ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("POST /api/profile -> 200 and returns the saved profile")
+    @DisplayName("POST /api/user-selections -> 200 and returns the saved profile")
     void saveProfile_returnsSavedProfile() throws Exception {
-        UserProfile requestDto = new UserProfile("john", List.of(1L));
-        UserProfile savedDto   = new UserProfile("john", List.of(1L));
+        UserSelectionView requestDto = new UserSelectionView("john", List.of(1L));
+        UserSelectionView savedDto   = new UserSelectionView("john", List.of(1L));
 
-        given(userProfileService.saveProfile(any(UserProfile.class)))
-                .willReturn(savedDto);
+        given(userSelectionService.saveSelection(any(UserSelectionView.class)))
+        .willReturn(savedDto);
 
-        mockMvc.perform(post("/api/profile")
+        mockMvc.perform(post("/api/user-selections")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("john"))
+                .andExpect(jsonPath("$.username").value("john"))
                 .andExpect(jsonPath("$.sectorIds[0]").value(1));
     }
 
     @Test
-    @DisplayName("GET /api/profile?name=john -> 200 and returns the profile")
+    @DisplayName("GET /api/user-selections?username=john -> 200 and returns the profile")
     void getProfile_returnsProfile() throws Exception {
-        UserProfile profile = new UserProfile("john", List.of(1L));
+        UserSelectionView profile = new UserSelectionView("john", List.of(1L));
 
-        given(userProfileService.getProfile("john"))
+        given(userSelectionService.getSelection("john"))
                 .willReturn(profile);
 
-        mockMvc.perform(get("/api/profile")
-                        .param("name", "john"))
+        mockMvc.perform(get("/api/user-selections")
+                        .param("username", "john"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("john"))
+                .andExpect(jsonPath("$.username").value("john"))
                 .andExpect(jsonPath("$.sectorIds[0]").value(1));
     }
 }
