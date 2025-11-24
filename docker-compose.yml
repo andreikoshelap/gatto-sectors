@@ -4,32 +4,31 @@ services:
       context: ./sectors-service
       dockerfile: sectors-service.dockerfile
     ports:
-      - "8085:8085"
+      - "8085:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://resource-postgres:5432/postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://sectors-postgres:5432/sectors
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=admin
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      - resource-postgres
+      - sectors-postgres
 
-  resource-postgres:
+  sectors-postgres:
     image: postgres:13
     ports:
       - "5434:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=sectors
     volumes:
-      - pgdata_resource:/var/lib/postgresql/data
+      - pgdata_sectors:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
       timeout: 5s
       retries: 20
 
-  resource-ui:
+  sectors-ui:
     build:
       context: ./sectors-ui
       dockerfile: sectors-ui.dockerfile
@@ -39,4 +38,4 @@ services:
       - sectors-app
 
 volumes:
-  pgdata_resource:
+  pgdata_sectors:

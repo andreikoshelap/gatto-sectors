@@ -7,7 +7,7 @@ import { Sector, SaveSectorRequest } from '../models/sector.model';
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = 'http://localhost:8080/api';
+  private readonly baseUrl = 'http://localhost:8085/api';
 
   constructor(private http: HttpClient) {}
 

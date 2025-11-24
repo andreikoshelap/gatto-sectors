@@ -1,8 +1,8 @@
 -- Schema initialization for Sectors Management App
 
 -- Drop existing tables (in correct order to respect FK constraints)
-DROP TABLE IF EXISTS sector;
 DROP TABLE IF EXISTS user_sector_selection;
+DROP TABLE IF EXISTS sector;
 
 -- Create tables
 CREATE TABLE IF NOT EXISTS sector (
