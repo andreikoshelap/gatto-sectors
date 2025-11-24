@@ -1,4 +1,4 @@
-package com.gatto.sectors;
+package com.gatto.sector;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

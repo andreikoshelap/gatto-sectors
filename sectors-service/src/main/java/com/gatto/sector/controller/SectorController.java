@@ -29,13 +29,13 @@ public class SectorController {
     @GetMapping("/{id}")
     public ResponseEntity<SectorView> get(@PathVariable Long id) {
         try {
-            SectorView resource = sectorService.findById(id).orElseThrow();
-            return ResponseEntity.ok(resource);
+            SectorView sector = sectorService.findById(id).orElseThrow();
+            return ResponseEntity.ok(sector);
         } catch (NoSuchElementException e) {
-            log.warn("Resource not found with ID: {}", id, e);
+            log.warn("Sector not found with ID: {}", id, e);
             return ResponseEntity.notFound().build();
         } catch (ObjectOptimisticLockingFailureException e) {
-            log.error("Optimistic locking failure while retrieving resource with ID: {}", id, e);
+            log.error("Optimistic locking failure while retrieving sector with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
@@ -46,13 +46,13 @@ public class SectorController {
             if (view.id() != null && !view.id().equals(id)) {
                 log.warn("Path ID {} != payload ID {}", id, view.id());
             }
-            SectorView savedResource = sectorService.update(id, view);
-            return ResponseEntity.ok(savedResource);
+            SectorView savedSector = sectorService.update(id, view);
+            return ResponseEntity.ok(savedSector);
         } catch (NoSuchElementException e) {
-            log.warn("Resource not found with ID: {}", id, e);
+            log.warn("Sector not found with ID: {}", id, e);
             return ResponseEntity.notFound().build();
         } catch (ObjectOptimisticLockingFailureException e) {
-            log.error("Optimistic locking failure while updating resource with ID: {}", id, e);
+            log.error("Optimistic locking failure while updating sector with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
@@ -60,14 +60,14 @@ public class SectorController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
-            log.info("Deleting resource with ID: {}", id);
+            log.info("Deleting sector with ID: {}", id);
             sectorService.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e) {
-            log.warn("Resource not found with ID: {}", id, e);
+            log.warn("Sector not found with ID: {}", id, e);
             return ResponseEntity.notFound().build();
         } catch (ObjectOptimisticLockingFailureException e) {
-            log.error("Optimistic locking failure while deleting resource with ID: {}", id, e);
+            log.error("Optimistic locking failure while deleting sector with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
