@@ -11,5 +11,4 @@ public interface UserSectorSelectionRepository extends JpaRepository<UserSectorS
 
     void deleteByUsername(String username);
 
-    boolean existsByUsername(String username);
 }

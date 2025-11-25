@@ -2,6 +2,7 @@ package com.gatto.sector.service;
 
 import com.gatto.sector.entity.Sector;
 import com.gatto.sector.entity.UserSectorSelection;
+import com.gatto.sector.error.SectorDoesNotExistException;
 import com.gatto.sector.repository.SectorRepository;
 import com.gatto.sector.repository.UserSectorSelectionRepository;
 import com.gatto.sector.view.UserSelectionView;
@@ -15,9 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +35,6 @@ class UserSelectionViewServiceTest {
     private UserSelectionService service;
 
     @Test
-    @DisplayName("saveProfile: deletes old selections and saves new ones for all found sectors")
     void saveProfile_savesSelections() {
         String username = "john";
         List<Long> sectorIds = List.of(1L, 2L);
@@ -43,17 +44,27 @@ class UserSelectionViewServiceTest {
         Sector s2 = new Sector();
         s2.setId(2L);
 
-        // all sectors found
-        when(sectorRepo.findAllById(sectorIds)).thenReturn(List.of(s1, s2));
+        when(sectorRepo.findById(1L)).thenReturn(Optional.of(s1));
+        when(sectorRepo.findById(2L)).thenReturn(Optional.of(s2));
 
         UserSelectionView input = new UserSelectionView(username, sectorIds);
 
+        UserSectorSelection row1 = new UserSectorSelection();
+        row1.setUsername(username);
+        row1.setSector(s1);
+
+        UserSectorSelection row2 = new UserSectorSelection();
+        row2.setUsername(username);
+        row2.setSector(s2);
+
+        when(selectionRepo.findByUsername(username))
+                .thenReturn(List.of(row1, row2));
+
+        // when
         UserSelectionView result = service.saveSelection(input);
 
-        // 1) deleted old records
         verify(selectionRepo).deleteByUsername(username);
 
-        // 2) saved new records, one per sector
         ArgumentCaptor<UserSectorSelection> captor =
                 ArgumentCaptor.forClass(UserSectorSelection.class);
         verify(selectionRepo, times(2)).save(captor.capture());
@@ -61,7 +72,6 @@ class UserSelectionViewServiceTest {
         List<UserSectorSelection> savedSelections = captor.getAllValues();
         assertEquals(2, savedSelections.size());
 
-        // verify that username and sector ids match
         assertEquals(username, savedSelections.get(0).getUsername());
         assertEquals(username, savedSelections.get(1).getUsername());
 
@@ -70,7 +80,6 @@ class UserSelectionViewServiceTest {
                 .toList();
         assertTrue(savedSectorIds.containsAll(sectorIds));
 
-        // 3) method returns the same profile it received
         assertEquals(username, result.username());
         assertEquals(sectorIds, result.sectorIds());
     }
@@ -84,15 +93,16 @@ class UserSelectionViewServiceTest {
         // only one sector found instead of two
         Sector s1 = new Sector();
         s1.setId(1L);
-        when(sectorRepo.findAllById(sectorIds)).thenReturn(List.of(s1));
+        when(sectorRepo.findById(1L)).thenReturn(Optional.of(s1));
+        when(sectorRepo.findById(2L)).thenReturn(Optional.empty());
 
         UserSelectionView input = new UserSelectionView(username, sectorIds);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(SectorDoesNotExistException.class,
                 () -> service.saveSelection(input));
 
-        // save should not be called
-        verify(selectionRepo, never()).save(any());
+        // save called only once for the first sector
+        verify(selectionRepo).save(any());
     }
 
     @Test

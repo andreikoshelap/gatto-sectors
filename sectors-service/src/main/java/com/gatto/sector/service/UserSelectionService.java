@@ -6,6 +6,7 @@ import com.gatto.sector.error.SectorDoesNotExistException;
 import com.gatto.sector.repository.SectorRepository;
 import com.gatto.sector.repository.UserSectorSelectionRepository;
 import com.gatto.sector.view.UserSelectionView;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +43,12 @@ public class UserSelectionService {
     public UserSelectionView getSelection(String username) {
         List<UserSectorSelection> rows = userSelectionRepo.findByUsername(username);
 
+        if (rows.isEmpty()) {
+            throw new EntityNotFoundException("No sector selections found for username: " + username);
+        }
+
         List<Long> sectorIds = rows.stream()
-                .map(r -> r.getSector().getId())
+                .map(row -> row.getSector().getId())
                 .toList();
 
         return new UserSelectionView(username, sectorIds);
