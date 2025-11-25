@@ -4,7 +4,7 @@ services:
       context: ./sectors-service
       dockerfile: sectors-service.dockerfile
     ports:
-      - "8085:8080"
+      - "8085:8085"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://sectors-postgres:5432/sectors
       - SPRING_DATASOURCE_USERNAME=postgres
